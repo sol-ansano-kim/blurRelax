@@ -50,7 +50,7 @@ SOFTWARE.
 #include <maya/MFnMeshData.h>
 #include <maya/MObject.h>
 #include <maya/MMeshSmoothOptions.h>
-#include <maya/MItMeshedge.h>
+#include <maya/MItMeshEdge.h>
 
 #include <unordered_map>
 #include <unordered_set>
@@ -84,6 +84,7 @@ SOFTWARE.
 #define float_t double
 #define point_t MPoint
 #define pointArray_t MPointArray
+#define UINT unsigned int
 
 
 void edgeProject(
@@ -224,7 +225,7 @@ void quickLaplacianSmooth(
 	}
 
 	memcpy(verts, outComp, nzc*sizeof(float_t));
-	delete outComp;
+	delete[] outComp;
 }
 
 
@@ -276,7 +277,7 @@ class BlurRelax : public MPxDeformerNode {
 				float envelope
 				) const;
 
-		void BlurRelax::buildQuickData(
+		void buildQuickData(
 			MObject &mesh,
 			MItGeometry& vertIter,
 			short borderBehavior,
@@ -844,7 +845,7 @@ void BlurRelax::quickRelax(
 
 		if (reproject) {
 			#pragma omp parallel for if(numVerts>2000)
-			for (int i = 0; i < nonzeroValence; ++i) {
+			for (int i = 0; i < (int)nonzeroValence; ++i) {
 				if ((creaseCount[i] == 0) && (group[order[i]])) {
 					point_t mf(verts[i][0], verts[i][1], verts[i][2]);
 					MPointOnMesh pom;
